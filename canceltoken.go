@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// CancelToken recieves and provides access to signals
+// CancelToken recieves signals and cancels launched go routines
 type CancelToken struct {
 	c           chan os.Signal
 	isCancelled bool
