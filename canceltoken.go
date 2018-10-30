@@ -4,9 +4,10 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"syscall"
 )
 
-// CancelToken recieves signals and cancels launched go routines
+// CancelToken recieves signals, cancels launched go routines and waits for them to exit
 type CancelToken struct {
 	c           chan os.Signal
 	isCancelled bool
@@ -17,12 +18,12 @@ type CancelToken struct {
 func NewCancelToken() *CancelToken {
 	t := CancelToken{}
 	t.c = make(chan os.Signal, 1)
-	signal.Notify(t.c)
+	signal.Notify(t.c, syscall.SIGINT, syscall.SIGTERM)
 	t.isCancelled = false
 	return &t
 }
 
-// Wait for the token to be cancelled and all WaitGroup members to finish
+// Wait for the token to be cancelled and all WaitGroup members to exit
 func (t *CancelToken) Wait() os.Signal {
 	s := <-t.c
 	t.isCancelled = true
