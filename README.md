@@ -15,6 +15,7 @@ func main() {
 	go func(t *canceltoken.CancelToken) {
 		defer ct.Done()
 		for !t.IsCancelled() {
+			// Do some work
 		}
 	}(ct)
 
