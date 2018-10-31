@@ -23,7 +23,7 @@ func TestCancelToken(t *testing.T) {
 		for i := 0; i < 3; i++ {
 			ct.Add(1)
 			go func(t *CancelToken) {
-				defer ct.Done()
+				defer t.Done()
 				for !t.IsCancelled() {
 					busyWork(50 * time.Millisecond)
 				}

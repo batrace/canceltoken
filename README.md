@@ -13,7 +13,7 @@ func main() {
 	ct := canceltoken.NewCancelToken()
 	ct.Add(1)
 	go func(t *canceltoken.CancelToken) {
-		defer ct.Done()
+		defer t.Done()
 		for !t.IsCancelled() {
 			// Do some work
 		}
