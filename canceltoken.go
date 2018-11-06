@@ -4,13 +4,14 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"sync/atomic"
 	"syscall"
 )
 
 // CancelToken recieves signals, cancels launched go routines and waits for them to exit
 type CancelToken struct {
 	c           chan os.Signal
-	isCancelled bool
+	isCancelled uint32
 	wg          sync.WaitGroup
 }
 
@@ -19,21 +20,22 @@ func NewCancelToken() *CancelToken {
 	t := CancelToken{}
 	t.c = make(chan os.Signal, 1)
 	signal.Notify(t.c, syscall.SIGINT, syscall.SIGTERM)
-	t.isCancelled = false
+	atomic.StoreUint32(&t.isCancelled, 0)
 	return &t
 }
 
 // Wait for the token to be cancelled and all WaitGroup members to exit
 func (t *CancelToken) Wait() os.Signal {
 	s := <-t.c
-	t.isCancelled = true
+	atomic.StoreUint32(&t.isCancelled, 1)
 	t.wg.Wait()
 	return s
 }
 
 // IsCancelled is true when signal is recieved
 func (t *CancelToken) IsCancelled() bool {
-	return t.isCancelled
+	cancelled := atomic.LoadUint32(&t.isCancelled)
+	return (cancelled == 1)
 }
 
 // Add is called to increment the WaitGroup
