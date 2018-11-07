@@ -38,7 +38,7 @@ func TestCancelToken(t *testing.T) {
 
 		sig := ct.Wait()
 		So(sig, ShouldEqual, syscall.SIGINT)
-		So(ct.isCancelled, ShouldEqual, 1)
+		So(ct.IsCancelled(), ShouldBeTrue)
 		So(atomic.LoadUint64(&exitcounter), ShouldEqual, 3)
 	})
 }
